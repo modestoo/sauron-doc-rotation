@@ -35,7 +35,6 @@ setup(
     download_url="https://github.com",
     keywords=["image-processing", "image-rotation", "rotation", "text"],
     packages=find_packages(exclude="src"),
-    classifiers=[],
     license="MIT",
     long_description=long_description,
     install_requires=run_requirements,
