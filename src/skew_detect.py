@@ -1,19 +1,26 @@
 """ Calculates skew angle """
-import os
+
 import imghdr
 import optparse
+import os
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from skimage import io
 from skimage.feature import canny
-from skimage.color import rgb2gray
 from skimage.transform import hough_line, hough_line_peaks
 
 
 class SkewDetect:
 
+    _instance = None
     piby4 = np.pi / 4
+
+    # Apply Singleton design pattern
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(SkewDetect, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
 
     def __init__(
         self,
@@ -23,7 +30,7 @@ class SkewDetect:
         sigma=3.0,
         display_output=None,
         num_peaks=20,
-        plot_hough=None
+        plot_hough=None,
     ):
 
         self.sigma = sigma
@@ -35,13 +42,11 @@ class SkewDetect:
         self.plot_hough = plot_hough
 
     def write_to_file(self, wfile, data):
-
         for d in data:
-            wfile.write(d + ': ' + str(data[d]) + '\n')
-        wfile.write('\n')
+            wfile.write(d + ": " + str(data[d]) + "\n")
+        wfile.write("\n")
 
     def get_max_freq_elem(self, arr):
-
         max_arr = []
         freqs = {}
         for i in arr:
@@ -60,12 +65,12 @@ class SkewDetect:
         return max_arr
 
     def display_hough(self, h, a, d):
-
         plt.imshow(
             np.log(1 + h),
             extent=[np.rad2deg(a[-1]), np.rad2deg(a[0]), d[-1], d[0]],
             cmap=plt.cm.gray,
-            aspect=1.0 / 90)
+            aspect=1.0 / 90,
+        )
         plt.show()
 
     def compare_sum(self, value):
@@ -75,27 +80,24 @@ class SkewDetect:
             return False
 
     def display(self, data):
-
         for i in data:
-            print i + ": " + str(data[i])
+            print(i + ": " + str(data[i]))
 
     def calculate_deviation(self, angle):
-
         angle_in_degrees = np.abs(angle)
         deviation = np.abs(SkewDetect.piby4 - angle_in_degrees)
 
         return deviation
 
     def run(self):
-
         if self.display_output:
-            if self.display_output.lower() == 'yes':
+            if self.display_output.lower() == "yes":
                 self.display_output = True
             else:
                 self.display_output = False
 
         if self.plot_hough:
-            if self.plot_hough.lower() == 'yes':
+            if self.plot_hough.lower() == "yes":
                 self.plot_hough = True
             else:
                 self.plot_hough = False
@@ -104,59 +106,65 @@ class SkewDetect:
             if self.batch_path:
                 self.batch_process()
             else:
-                print "Invalid input, nothing to process."
+                print("Invalid input, nothing to process.")
         else:
-            self.process_single_file()
+            return self.process_single_file()
 
     def check_path(self, path):
-
         if os.path.isabs(path):
             full_path = path
         else:
-            full_path = os.getcwd() + '/' + str(path)
+            full_path = os.getcwd() + "/" + str(path)
         return full_path
 
     def process_single_file(self):
-
-        file_path = self.check_path(self.input_file)
-        res = self.determine_skew(file_path)
+        self.file_path = self.check_path(self.input_file)
+        res = self.determine_skew(self.file_path)
 
         if self.output_file:
             output_path = self.check_path(self.output_file)
-            wfile = open(output_path, 'w')
+            wfile = open(output_path, "w")
             self.write_to_file(wfile, res)
             wfile.close()
 
         return res
 
-    def batch_process(self):
+    @classmethod
+    def processing_skew(cls, skimage_img):
+        instance = cls()
+        response = instance.determine_skew(skimage_img, is_path_img=False)
+        return response
 
+    def batch_process(self):
         wfile = None
 
-        if self.batch_path == '.':
-            self.batch_path = ''
+        if self.batch_path == ".":
+            self.batch_path = ""
 
         abs_path = self.check_path(self.batch_path)
         files = os.listdir(abs_path)
 
         if self.output_file:
-            out_path = self.check_path(self.output_file)
-            wfile = open(file_path, 'w')
+            _ = self.check_path(self.output_file)
+            wfile = open(self.file_path, "w")
 
         for f in files:
-            file_path = abs_path + '/' + f
-            if os.path.isdir(file_path):
+            self.file_path = abs_path + "/" + f
+            if os.path.isdir(self.file_path):
                 continue
-            if imghdr.what(file_path):
-                res = self.determine_skew(file_path)
+            if imghdr.what(self.file_path):
+                res = self.determine_skew(self.file_path)
                 if wfile:
                     self.write_to_file(wfile, res)
         if wfile:
             wfile.close()
 
-    def determine_skew(self, img_file):
+    def determine_skew(self, img_file, is_path_img=True):
+        if is_path_img:
+            img = io.imread(img_file, as_gray=True)
+        else:
+            img = img_file
 
-        img = io.imread(img_file, as_grey=True)
         edges = canny(img, sigma=self.sigma)
         h, a, d = hough_line(edges)
         _, ap, _ = hough_line_peaks(h, a, d, num_peaks=self.num_peaks)
@@ -215,7 +223,8 @@ class SkewDetect:
             "Image File": img_file,
             "Average Deviation from pi/4": average_deviation,
             "Estimated Angle": ans_res,
-            "Angle bins": angles}
+            "Angle bins": angles,
+        }
 
         if self.display_output:
             self.display(data)
@@ -224,47 +233,46 @@ class SkewDetect:
             self.display_hough(h, a, d)
         return data
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 
     parser = optparse.OptionParser()
 
     parser.add_option(
-        '-b', '--batch',
+        "-b",
+        "--batch",
         default=None,
-        dest='batch_path',
-        help='Path for batch processing')
+        dest="batch_path",
+        help="Path for batch processing",
+    )
     parser.add_option(
-        '-d', '--display',
-        default=None,
-        dest='display_output',
-        help='Display logs')
+        "-d", "--display", default=None, dest="display_output", help="Display logs"
+    )
     parser.add_option(
-        '-i', '--input',
-        default=None,
-        dest='input_file',
-        help='Input file name')
+        "-i", "--input", default=None, dest="input_file", help="Input file name"
+    )
     parser.add_option(
-        '-n', '--num',
+        "-n",
+        "--num",
         default=20,
-        dest='num_peaks',
-        help='Number of Hough Transform peaks',
-        type=int)
+        dest="num_peaks",
+        help="Number of Hough Transform peaks",
+        type=int,
+    )
     parser.add_option(
-        '-o', '--output',
-        default=None,
-        dest='output_file',
-        help='Output file name')
+        "-o", "--output", default=None, dest="output_file", help="Output file name"
+    )
     parser.add_option(
-        '-p', '--plot',
-        default=None,
-        dest='plot_hough',
-        help='Plot the Hough Transform')
+        "-p", "--plot", default=None, dest="plot_hough", help="Plot the Hough Transform"
+    )
     parser.add_option(
-        '-s', '--sigma',
+        "-s",
+        "--sigma",
         default=3.0,
-        dest='sigma',
-        help='Sigma for Canny Edge Detection',
-        type=float)
+        dest="sigma",
+        help="Sigma for Canny Edge Detection",
+        type=float,
+    )
     options, args = parser.parse_args()
     skew_obj = SkewDetect(
         options.input_file,
@@ -273,5 +281,6 @@ if __name__ == '__main__':
         options.sigma,
         options.display_output,
         options.num_peaks,
-        options.plot_hough)
+        options.plot_hough,
+    )
     skew_obj.run()
