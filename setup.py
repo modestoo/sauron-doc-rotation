@@ -36,9 +36,14 @@ setup(
     keywords=["image-processing", "image-rotation", "rotation", "text"],
     packages=find_packages(exclude="src"),
     classifiers=[],
-    license="COPYRIGHT",
-    zip_safe=False,
+    license="MIT",
     long_description=long_description,
     install_requires=run_requirements,
     python_requires="==3.10.*",
+    classifiers=[
+        "Intended Audience :: Information Technology",
+        "Natural Language :: English",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python :: 3.10",
+    ],
 )
