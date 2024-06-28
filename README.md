@@ -1,6 +1,8 @@
 ## Sauron-doc-rotation
 
-[![PyPI version](https://badge.fury.io/py/sauron-doc-rotation.svg)](https://badge.fury.io/py/sauron-doc-rotation)
+[![PyPI version](https://badge.fury.io/py/alyn.svg)](https://badge.fury.io/py/alyn)
+![Static Badge](https://img.shields.io/badge/python-3.10.*-blue)
+![Static Badge](https://img.shields.io/badge/license-MIT-blue)
 
 The Sauron DOC rotation is a simple project that aims to rotate a base64 image to keep it in the correct direction.
 
