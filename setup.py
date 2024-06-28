@@ -14,7 +14,7 @@ run_requirements = [
     "loguru==0.7.2",
 ]
 
-with io.open("./src/__init__.py", encoding="utf8") as version_f:
+with io.open("./sauron_doc_rotation/__init__.py", encoding="utf8") as version_f:
     version_match = re.search(
         r"^__version__ = ['\"]([^'\"]*)['\"]", version_f.read(), re.M
     )
@@ -34,9 +34,10 @@ setup(
     url="https://github.com/modestoo/sauron-doc-rotation.git",
     download_url="https://github.com",
     keywords=["image-processing", "image-rotation", "rotation", "text"],
-    packages=find_packages(exclude="src"),
+    packages=find_packages(),
     license="MIT",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     install_requires=run_requirements,
     python_requires="==3.10.*",
     classifiers=[

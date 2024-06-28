@@ -9,9 +9,9 @@ You can use the **rotate_image_base64** method in **sauron_rotate** to rotate yo
 The following code shows how you can use this method.
 
 ```python
-from src import sauron_rotate
+from sauron_doc_rotate.sauron_rotate import SauronRotate
 
-sr = sauron_rotate.SauronRotate(enable_logging=False)
+sr = SauronRotate(enable_logging=False)
 
 sr.rotate_image_base64(img_base64)
 ```
