@@ -1,6 +1,6 @@
 ## Sauron-doc-rotation
 
-[![PyPI version](https://badge.fury.io/py/alyn.svg)](https://badge.fury.io/py/alyn)
+[![PyPI version](https://badge.fury.io/py/sauron-doc-rotation.svg)](https://badge.fury.io/py/sauron-doc-rotation)
 ![Static Badge](https://img.shields.io/badge/python-3.10.*-blue)
 ![Static Badge](https://img.shields.io/badge/license-MIT-blue)
 
